@@ -1,4 +1,4 @@
-import './globals.css'
+import "./globals.css";
 import { Inter } from 'next/font/google'
 import { Dancing_Script } from 'next/font/google'
 import { Lobster_Two } from 'next/font/google'
