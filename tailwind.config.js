@@ -15,12 +15,12 @@ module.exports = {
     },
     colors:{
       'klove': '#D21312',
-      'nav-bar-clr': '#F99B7D',
-      'signup-btn-clr':'#FFE5CA',
-      'login-btn-clr':'#E76161',
-      'body-clr': '#FFF3E2',
-      'write-btn-clr': '#FA9884',
-      'post-btn-clr':'#B04759',
+      'maroon-light': '#F99B7D',  // maroon-light
+      'peach-light':'#FFE5CA', // peach-light
+      'peach-red':'#E76161', // peach-red
+      'peach-lighter': '#FFF3E2',  // peach-lighter
+      'peach-dark': '#FA9884', // peach-dark
+      'maroon-dark':'#B04759', // maroon-dark
     },
   },
   plugins: [],
