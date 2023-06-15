@@ -2,10 +2,11 @@ import "./globals.css";
 import { Inter } from 'next/font/google'
 import { Dancing_Script } from 'next/font/google'
 import { Lobster_Two } from 'next/font/google'
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({ subsets: ['latin'] })
-const dancingScript = Dancing_Script({subsets: ['latin']})
-const lobsterTwo = Lobster_Two({subsets: ['latin'], weight:['400', '700']})
+const dancingScript = Dancing_Script({ subsets: ['latin'] })
+const lobsterTwo = Lobster_Two({ subsets: ['latin'], weight: ['400', '700'] })
 
 export const metadata = {
   title: 'Create Next App',
@@ -15,7 +16,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={lobsterTwo.className}>{children}</body>
+      <body className={lobsterTwo.className}>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   )
 }
