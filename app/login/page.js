@@ -1,26 +1,32 @@
 "use client";
 import { useState } from "react";
 import {auth, signInWithGoogle} from "../../firebase.config";
-import {useRouter} from "next/navigation"
+import {useRouter} from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+
 
 
 
 export default function login(){
 
     const router = useRouter();
-   
 
-    const handleLogin = async ()=>{
-        // console.log("clicked");
-        const userLogin = await signInWithGoogle();
-        router.push("/dashboard");
+
+    const { loginWithGoogle} = useAuth();
+
+
+    const handleLogin = ()=>{
+        const loginUser = loginWithGoogle();
+        router.push('/dashboard');
     }
+
+
 
 
 
     return (
         <div>
-            <button className="fixed md:left-[45%] left-[35%] top-[50%] text-xl bg-peach-red px-8 py-2 rounded-3xl" onClick={handleLogin}>Login with Google</button>
+            <button onClick={handleLogin} className="fixed md:left-[45%] left-[35%] top-[50%] text-xl bg-peach-red px-8 py-2 rounded-3xl">Login with Google</button>
         </div>
     )
 }
