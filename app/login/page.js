@@ -15,8 +15,8 @@ export default function login(){
     const { loginWithGoogle} = useAuth();
 
 
-    const handleLogin = ()=>{
-        const loginUser = loginWithGoogle();
+    const handleLogin = async ()=>{
+        const loginUser = await loginWithGoogle();
         router.push('/dashboard');
     }
 
