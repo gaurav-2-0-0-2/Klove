@@ -21,6 +21,8 @@ module.exports = {
       'peach-lighter': '#FFF3E2',  // peach-lighter
       'peach-dark': '#FA9884', // peach-dark
       'maroon-dark':'#B04759', // maroon-dark
+      'light-grey': '#998E8E',
+      'white': "#FFFFFF"
     },
   },
   plugins: [],
