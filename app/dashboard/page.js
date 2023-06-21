@@ -1,12 +1,13 @@
 "use client";
-import { auth, db, logout } from "../../firebase.config";
-import { query, collection, getDocs, where } from "firebase/firestore";
+import { auth, db, logout, postRecipe } from "../../firebase.config";
+import { query, collection, getDocs, where, addDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { FaUser, FaHome, FaSearch, FaEdit } from "react-icons/fa"
 import { Input } from "antd";
 const { TextArea } = Input;
+
 
 
 // Made this a prrotected route 
@@ -18,6 +19,9 @@ export default function Dashboard() {
     const [textarea, setTextarea] = useState(false);
 
     const { currentUser, signout } = useAuth();
+
+
+    const posts = []; // to store users posts 
 
     useEffect(() => {
         if (currentUser) {
@@ -38,8 +42,37 @@ export default function Dashboard() {
         setTextarea(true);
     }
 
+    const dbRef = collection(db, "posts");
+
+    const postData = {
+        content: "Paani mein aloo ubaalo",
+        title: "Aloo ki Sabzi",
+        uid:currentUser.uid
+    }
+
+
+    const postRecipe = async () => {
+        try {
+            const querySnapshot = await getDocs(query(dbRef));
+            if (querySnapshot.size === 0) {
+                await addDoc(dbRef, postData);
+                console.log('Document added successfully.');
+            } else {
+                console.log('Document already exists.');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+
+
+
+
+
+
     return (
-        <div className="relative">
+        <div className="flex flex-row gap-10">
 
             <div className="flex flex-col text-center h-screen max-w-[10rem] bg-maroon-light px-6">
                 <nav className="flex-1 mt-6">
@@ -63,15 +96,15 @@ export default function Dashboard() {
             </div>
 
 
-            {textarea ? (<div>
-                <TextArea rows={25} className="w-[60%] absolute top-[10%] left-[20%]" />
-                <button className="absolute left-[70%] bottom-[5%] bg-maroon-dark px-10 py-2 font-bold text-2xl text-white hover:bg-maroon-light drop-shadow-2xl">POST</button>
+            <div className="basis-1/2 mt-4">{textarea ? (<div>
+                <TextArea className="text-md" rows={25} placeholder="Write your Recipe..." />
+                <button onClick={postRecipe} className="mt-2 bg-maroon-dark px-10 py-2 font-bold text-2xl text-white hover:bg-maroon-light drop-shadow-2xl">POST</button>
             </div>) : (
                 <div className="fixed top-[40%] left-[50%] text-center">
                     <h1 className="text-light-grey text-3xl font-thin mb-10">No Activity Yet</h1>
                     <button onClick={handleClick} className="bg-maroon-dark px-10 py-2 font-bold text-2xl text-white hover:bg-maroon-light drop-shadow-2xl">WRITE</button>
                 </div>
-            )}
+            )}</div>
 
 
             {/* <button onClick={}>Get Doc</button> */}
