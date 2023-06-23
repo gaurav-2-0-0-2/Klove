@@ -1,7 +1,7 @@
 "use client";
 import { auth, db, logout, postRecipe } from "../../firebase.config";
 import { query, collection, getDocs, where, addDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { FaUser, FaHome, FaSearch, FaEdit } from "react-icons/fa"
@@ -16,12 +16,19 @@ export default function Dashboard() {
 
     const router = useRouter();
 
+    const formRef = useRef();
+
+    const [title, setTitle] = useState('');
+    const [recipe, setRecipe] = useState('');
+
     const [textarea, setTextarea] = useState(false);
+
+
 
     const { currentUser, signout } = useAuth();
 
 
-    const posts = []; // to store users posts 
+    const posts = []; // to store users posts for frontend 
 
     useEffect(() => {
         if (currentUser) {
@@ -44,32 +51,31 @@ export default function Dashboard() {
 
     const dbRef = collection(db, "posts");
 
-    const postData = {
-        content: "Paani mein aloo ubaalo",
-        title: "Aloo ki Sabzi",
-        uid:currentUser.uid
-    }
+    const postRecipe = async (e) => {
 
+        e.preventDefault();
+        console.log(e);
 
-    const postRecipe = async () => {
+        const newRecipe = {
+            title: e.target[0].value,
+            content: e.target[1].value,
+            uid: currentUser.uid
+        }
+
         try {
-            const querySnapshot = await getDocs(query(dbRef));
-            if (querySnapshot.size === 0) {
-                await addDoc(dbRef, postData);
-                console.log('Document added successfully.');
-            } else {
-                console.log('Document already exists.');
-            }
+            // const querySnapshot = await getDocs(query(dbRef));
+            // if (querySnapshot.size === 0) {
+            await addDoc(dbRef, newRecipe);
+            // console.log(newRecipe);
+            posts.push(newRecipe);
+            console.log(posts);
+            // } else {
+            //     console.log('Document already exists.');
+            // }
         } catch (err) {
             console.error(err);
         }
     };
-
-
-
-
-
-
 
     return (
         <div className="flex flex-row gap-10">
@@ -96,15 +102,32 @@ export default function Dashboard() {
             </div>
 
 
-            <div className="basis-1/2 mt-4">{textarea ? (<div>
-                <TextArea className="text-md" rows={25} placeholder="Write your Recipe..." />
-                <button onClick={postRecipe} className="mt-2 bg-maroon-dark px-10 py-2 font-bold text-2xl text-white hover:bg-maroon-light drop-shadow-2xl">POST</button>
-            </div>) : (
-                <div className="fixed top-[40%] left-[50%] text-center">
-                    <h1 className="text-light-grey text-3xl font-thin mb-10">No Activity Yet</h1>
-                    <button onClick={handleClick} className="bg-maroon-dark px-10 py-2 font-bold text-2xl text-white hover:bg-maroon-light drop-shadow-2xl">WRITE</button>
+            {posts.length === 0 ? (
+                <div className="basis-1/2 mt-4">{textarea ? (<div>
+                    <form onSubmit={postRecipe} ref={formRef}>
+                        <input type="text" placeholder="Title" />
+                        <TextArea className="text-md mt-2" rows={25} placeholder="Write your Recipe..." />
+                        <button type="submit" className="mt-2 bg-maroon-dark px-10 py-2 font-bold text-2xl text-white hover:bg-maroon-light drop-shadow-2xl">POST</button>
+                    </form>
+                </div>) : (
+                    <div className="fixed top-[40%] left-[50%] text-center">
+                        <h1 className="text-light-grey text-3xl font-thin mb-10">No Activity Yet</h1>
+                        <button onClick={handleClick} className="bg-maroon-dark px-10 py-2 font-bold text-2xl text-white hover:bg-maroon-light drop-shadow-2xl">WRITE</button>
+                    </div>
+                )}</div>
+            ) : (
+                <div>
+                    {posts.map((post) => {
+                        return (
+                            <div key={post.uid}>
+                                <h1>{post.title}</h1>
+                                <p>{post.content}</p>
+                            </div>
+                        )
+                    })}
                 </div>
-            )}</div>
+            )}
+
 
 
             {/* <button onClick={}>Get Doc</button> */}
