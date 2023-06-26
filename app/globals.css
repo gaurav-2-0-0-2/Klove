@@ -3,9 +3,6 @@
 @import 'tailwindcss/utilities';
 
 
-body{
-    background-color: rgb(255, 243, 226);
-}
 
 .img1 {
 
@@ -15,8 +12,6 @@ body{
     animation-timing-function: ease-in-out;
     animation-fill-mode: forwards;
     
-
-
 }
 
 
