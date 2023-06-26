@@ -14,15 +14,14 @@ module.exports = {
       },
     },
     colors:{
-      'klove': '#D21312',
-      'maroon-light': '#F99B7D',  // maroon-light
-      'peach-light':'#FFE5CA', // peach-light
-      'peach-red':'#E76161', // peach-red
-      'peach-lighter': '#FFF3E2',  // peach-lighter
-      'peach-dark': '#FA9884', // peach-dark
-      'maroon-dark':'#B04759', // maroon-dark
-      'light-grey': '#998E8E',
-      'white': "#FFFFFF"
+      'white': "#FFFFFF",
+      'klove': '#0D7817',
+      'semi-bold-green': '#65C763',
+      'semi-bold-green-dark': '#5BB88B',
+      'fresh-green': '#7BCF6B',
+      'vibrant-orange': '#FF7F50',
+      'vibrant-orange-dark': '#FF885C',
+      'dark-gray': '#1E1E1E',
     },
   },
   plugins: [],
