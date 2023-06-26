@@ -16,6 +16,7 @@ import {
     collection,
     where,
     addDoc,
+    
 } from "firebase/firestore";
 // import { getAuth } from 'firebase/auth';
 
@@ -67,6 +68,9 @@ const signInWithGoogle = async ()=>{
 };
 
 
+
+
+
 const logout = () =>{
     signOut(auth);
 }
@@ -76,6 +80,7 @@ export {
   db,
   signInWithGoogle,
   logout,
+  
 };
 
 
