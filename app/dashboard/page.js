@@ -1,12 +1,20 @@
 "use client";
+import React from 'react';
 import { auth, db, logout, postRecipe } from "../../firebase.config";
 import { query, collection, getDocs, where, addDoc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { FaUser, FaHome, FaSearch, FaEdit, FaHeart, FaTrash } from "react-icons/fa"
-import { Input } from "antd";
-const { TextArea } = Input;
+import { Modal } from "antd";
+import NoActivity from "../component/NoActivity";
+import RecipeForm from "../component/RecipeForm";
+import LoadingText from "../component/LoadingText";
+import ModalForm from "../component/Modal";
+import { Button } from "@nextui-org/react";
+
+
+
 
 
 
@@ -18,62 +26,21 @@ export default function Dashboard() {
 
     const formRef = useRef();
 
+    const [loading, setLoading] = useState(true);
     const [title, setTitle] = useState('');
     const [posts, setPosts] = useState(null);
     const [textarea, setTextarea] = useState(false);
+    // const [open, setOpen] = useState(false);
+    const [openModal, setOpenModal] = React.useState(false);
+
+
 
 
 
     const { currentUser, signout } = useAuth();
 
-    useEffect(() => {
-        if (currentUser) {
-            console.log("signed in");
-        } else if (currentUser == null) {
-            router.push("/login");
-        }
-
-        // fetchPosts();
-
-
-        
-
-    }, [])
-    // console.log(currentUser);
-
-    // const fetchPosts = async () => {
-    //     const response = collection(db, 'posts');
-    //     console.log(response);
-    // }
-
-    const handleLogout = () => {
-        const logoutUser = signout();
-        router.push("/");
-    }
-
-
-    const handleClick = () => {
-        setTextarea(true);
-    }
-
-    const dbRef = collection(db, "posts");
-
-    const postRecipe = async (e) => {
-
-        e.preventDefault();
-        console.log(e);
-
-        const newRecipe = {
-            title: e.target[0].value,
-            content: e.target[1].value,
-            uid: currentUser.uid
-        }
-
-        try {
-            // Adding document in posts collection on firestore
-            await addDoc(dbRef, newRecipe);
-
-            // querying the posts collection
+    const queryDB = () => {
+        // querying the posts collection
         const q = query(collection(db, "posts"));
         const unsubscribe = onSnapshot(q, (snapshot) => {
 
@@ -94,11 +61,76 @@ export default function Dashboard() {
                 // }
             });
             setPosts(updatePosts);
+            setLoading(false);
         });
 
         console.log(posts);
 
         return () => unsubscribe();
+    }
+
+    useEffect(() => {
+        if (currentUser) {
+            console.log("signed in");
+            queryDB();
+        } else if (currentUser == null) {
+            router.push("/login");
+        }
+
+        // fetchPosts();
+
+
+
+
+    }, []);
+    // console.log(currentUser);
+
+    // const fetchPosts = async () => {
+    //     const response = collection(db, 'posts');
+    //     console.log(response);
+    // }
+
+    // if (loading) {
+    //     return (
+    //         <div>Laoding...</div>
+    //     )
+    // }
+
+
+    const handleLogout = () => {
+        const logoutUser = signout();
+        router.push("/");
+    }
+
+
+    const handleClick = () => {
+        setTextarea(true);
+    }
+
+    // const cancelPost = () => {
+    //     setOpen(false);
+    // }
+
+    const dbRef = collection(db, "posts");
+
+    const postRecipe = async (e) => {
+
+        e.preventDefault();
+        console.log(e);
+
+        // setOpen(false);
+
+        const newRecipe = {
+            title: e.target[0].value,
+            content: e.target[1].value,
+            uid: currentUser.uid
+        }
+
+        try {
+            // Adding document in posts collection on firestore
+            await addDoc(dbRef, newRecipe);
+            queryDB();
+
             // posts.push(newRecipe);
             // console.log(posts);
         } catch (err) {
@@ -106,12 +138,22 @@ export default function Dashboard() {
         }
     };
 
+
+
+    const handler = () => setOpenModal(true);
+    const closeHandler = () => {
+        setOpenModal(false);
+        console.log("closed");
+    };
+
+
+
     return (
         <div className="flex flex-row gap-10">
 
             {/* Vertical Navbar on far left */}
 
-            <div className="flex flex-col text-center h-screen max-w-[10rem] bg-maroon-light px-6">
+            <div className="flex flex-col text-center h-screen max-w-[10rem] px-6 shadow-lg">
                 <nav className="flex-1 mt-6">
                     <div className="mt-12 cursor-pointer">
                         <img src={currentUser.photoURL} className="inline-block rounded-full w-[50px]" alt="profile-pic" />
@@ -119,48 +161,58 @@ export default function Dashboard() {
                     <div className="mt-12 cursor-pointer">
                         <FaSearch size={25} className="inline-block text-16" />
                     </div>
-                    <div className="mt-12 cursor-pointer">
+                    <Button onPress={handler} className="mt-12 cursor-pointer">
                         <FaEdit size={25} className="inline-block text-16" />
-                    </div>
+                    </Button>
+
+                    {/* Antd Modal  */}
+                    {/* <Modal title='New Post' onCancel={cancelPost} open={open}>
+                        <RecipeForm handleSubmit={postRecipe} handleRef={formRef}/>
+                    </Modal> */}
+
+                    {/* NextUI Modal  */}
+                    <ModalForm openModal={openModal} closeHandler={closeHandler} buttonText='POST'></ModalForm>
 
                 </nav>
 
-                <button className="block mb-10 px-4 py-2 bg-white rounded-full hover:bg-peach-red shadow-2xl shadow-maroon-dark" onClick={handleLogout}>Logout</button>
+                <button className="block mb-10 px-4 py-2 bg-fresh-green rounded-full hover:bg-semi-bold-green shadow-md shadow-semi-bold-green" onClick={handleLogout}>Logout</button>
             </div>
 
 
             {/* body of dashboard */}
 
             {posts && posts.length > 0 ? (
-                <div className="grid grid-cols-3 gap-6">
-                    {posts.map((post, index) => {
-                        return (
-                            <div key={index} className="bg-white px-4 py-4">
-                                <h1 className="bg-peach-lighter">{post.title}</h1>
-                                <p className="bg-maroon-light">{post.content}</p>
-                                <div className="flex flex-row">
-                                    <FaHeart/>
-                                    <FaTrash/>
+                <div className="grid grid-cols-1 gap-3 h-screen overflow-y-auto w-[50%]">
+                    <div className="h-[10%]">
+                        {posts.map((post, index) => {
+                            return (
+                                <div key={index} className="bg-fresh-green px-4 py-4">
+                                    <h1 className="text-lg font-bold">{post.title}</h1>
+                                    <div className="flex flex-row gap-4">
+                                        <img className="rounded-full h-[20px] w-[20px]" width={25} height={25} src={currentUser.photoURL} alt="profilePhoto" />
+                                        <div>
+                                            <p>{currentUser.displayName}</p>
+                                            <p>{post.content}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-row">
+                                        <FaHeart />
+                                        <FaTrash />
+                                    </div>
                                 </div>
-                            </div>
-                        )
-                    })}
+                            )
+                        })}
+                    </div>
                 </div>
+
             ) : (
-                
-                    <div className="basis-1/2 mt-4">{textarea ? (<div>
-                        <form onSubmit={postRecipe} ref={formRef}>
-                            <input type="text" placeholder="Title" />
-                            <TextArea className="text-md mt-2" rows={25} placeholder="Write your Recipe..." />
-                            <button type="submit" className="mt-2 bg-maroon-dark px-10 py-2 font-bold text-2xl text-white hover:bg-maroon-light drop-shadow-2xl">POST</button>
-                        </form>
-                    </div>) : (
-                        <div className="fixed top-[40%] left-[50%] text-center">
-                            <h1 className="text-light-grey text-3xl font-thin mb-10">No Activity Yet</h1>
-                            <button onClick={handleClick} className="bg-maroon-dark px-10 py-2 font-bold text-2xl text-white hover:bg-maroon-light drop-shadow-2xl">WRITE</button>
-                        </div>
-                    )}</div>
-                
+
+                <div className="basis-1/2 mt-4">{textarea ? (<div>
+                    <RecipeForm handleSubmit={postRecipe} handleRef={formRef} />
+                </div>) : (
+                    loading ? <LoadingText /> : <NoActivity handleClick={handleClick} />
+                )}</div>
+
             )}
 
 
@@ -177,7 +229,6 @@ export default function Dashboard() {
 
 
 
-            {/* <button onClick={}>Get Doc</button> */}
 
 
         </div>
