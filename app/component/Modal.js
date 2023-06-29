@@ -1,25 +1,24 @@
 import React from "react";
-import { Modal, Button} from "@nextui-org/react";
+import { Modal, Button } from "@nextui-org/react";
 
 
-export default function ModalForm({openModal, closeHandler, buttonText}){
-  
+export default function ModalForm({ openModal, closeHandler, content }) {
+
   return (
-      <Modal
-        closeButton
-        blur
-        aria-labelledby="modal-title"
-        open={openModal}
-        onClose={closeHandler}
-      >
-        <Modal.Footer>
-          <Button auto flat color="error" onPress={closeHandler}>
-            Close
-          </Button>
-          <Button auto onPress={closeHandler}>
-            {buttonText}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+    <Modal
+      closeButton
+      blur
+      aria-labelledby="modal-title"
+      open={openModal}
+      onClose={closeHandler}
+      width="800px"
+      css={{
+        padding: '$12'
+      }}
+    >
+      <Modal.Body>
+        {content}
+      </Modal.Body>
+    </Modal>
   );
 }
