@@ -49,7 +49,8 @@ export default function Dashboard() {
 
                 if (change.type === "added") {
                     console.log("New post: ", change.doc.data());
-                    updatePosts.push(change.doc.data());
+                    // updatePosts.push(change.doc.data());
+                    updatePosts.shift(change.doc.data());
                     // setPosts((prevPosts) => [...prevPosts, change.doc.data()]);
 
                 }
@@ -83,18 +84,7 @@ export default function Dashboard() {
 
 
     }, []);
-    // console.log(currentUser);
 
-    // const fetchPosts = async () => {
-    //     const response = collection(db, 'posts');
-    //     console.log(response);
-    // }
-
-    // if (loading) {
-    //     return (
-    //         <div>Laoding...</div>
-    //     )
-    // }
 
 
     const handleLogout = () => {
@@ -159,11 +149,14 @@ export default function Dashboard() {
                         <img src={currentUser.photoURL} className="inline-block rounded-full w-[50px]" alt="profile-pic" />
                     </div>
                     <div className="mt-12 cursor-pointer">
-                        <FaSearch size={25} className="inline-block text-16" />
+                        <FaSearch size={15} className="inline-block text-16" />
                     </div>
-                    <Button onPress={handler} className="mt-12 cursor-pointer">
-                        <FaEdit size={25} className="inline-block text-16" />
-                    </Button>
+                    <div className="mt-12 cursor-pointer">
+                        <Button onPress={handler} size='xs' css={{ backgroundColor: '$blue400' }}>
+                            <FaEdit size={15} className="inline-block" />
+                        </Button>
+                    </div>
+
 
                     {/* Antd Modal  */}
                     {/* <Modal title='New Post' onCancel={cancelPost} open={open}>
@@ -171,7 +164,7 @@ export default function Dashboard() {
                     </Modal> */}
 
                     {/* NextUI Modal  */}
-                    <ModalForm openModal={openModal} closeHandler={closeHandler} buttonText='POST'></ModalForm>
+                    <ModalForm content={<RecipeForm handleSubmit={postRecipe} handleRef={formRef}/>} openModal={openModal} closeHandler={closeHandler}/>
 
                 </nav>
 
@@ -182,11 +175,11 @@ export default function Dashboard() {
             {/* body of dashboard */}
 
             {posts && posts.length > 0 ? (
-                <div className="grid grid-cols-1 gap-3 h-screen overflow-y-auto w-[50%]">
+                <div className="grid grid-cols-1 h-screen overflow-y-auto w-[50%]">
                     <div className="h-[10%]">
                         {posts.map((post, index) => {
                             return (
-                                <div key={index} className="bg-fresh-green px-4 py-4">
+                                <div key={index} className="bg-fresh-green px-4 py-4 mt-4">
                                     <h1 className="text-lg font-bold">{post.title}</h1>
                                     <div className="flex flex-row gap-4">
                                         <img className="rounded-full h-[20px] w-[20px]" width={25} height={25} src={currentUser.photoURL} alt="profilePhoto" />
@@ -234,3 +227,9 @@ export default function Dashboard() {
         </div>
     )
 } 
+
+
+// Things to implement
+// 1. Change the style Navbar buttons on dashboard page 
+// 2. Remove the scrollbar on dashboard page 
+// 3. Add timestamps to posts 
