@@ -2,7 +2,9 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-
+body{
+    background-color: rgb(232, 242, 218);
+}
 
 .img1 {
 
