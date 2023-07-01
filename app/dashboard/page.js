@@ -1,17 +1,17 @@
 "use client";
 import React from 'react';
 import { auth, db, logout, postRecipe } from "../../firebase.config";
-import { query, collection, getDocs, where, addDoc, onSnapshot } from "firebase/firestore";
+import { query, collection, getDocs, where, addDoc, onSnapshot, deleteDoc, doc } from "firebase/firestore";
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { FaUser, FaHome, FaSearch, FaEdit, FaHeart, FaTrash } from "react-icons/fa"
-import { Modal } from "antd";
 import NoActivity from "../component/NoActivity";
 import RecipeForm from "../component/RecipeForm";
 import LoadingText from "../component/LoadingText";
 import ModalForm from "../component/Modal";
 import { Button } from "@nextui-org/react";
+import { MdDeleteOutline, MdFavoriteBorder } from "react-icons/md";
 
 
 
@@ -39,9 +39,11 @@ export default function Dashboard() {
 
     const { currentUser, signout } = useAuth();
 
+    const dbRef = collection(db, "posts");
+
     const queryDB = () => {
         // querying the posts collection
-        const q = query(collection(db, "posts"));
+        const q = query(dbRef);
         const unsubscribe = onSnapshot(q, (snapshot) => {
 
             let updatePosts = [];
@@ -50,7 +52,7 @@ export default function Dashboard() {
                 if (change.type === "added") {
                     console.log("New post: ", change.doc.data());
                     // updatePosts.push(change.doc.data());
-                    updatePosts.shift(change.doc.data());
+                    updatePosts.push(change.doc.data());
                     // setPosts((prevPosts) => [...prevPosts, change.doc.data()]);
 
                 }
@@ -85,30 +87,27 @@ export default function Dashboard() {
 
     }, []);
 
-
+    // Handling Logout  ---- Need to make some changes 
+    // User is not redirected to login page gives an error {{'photoURL not defined'}}
 
     const handleLogout = () => {
         const logoutUser = signout();
         router.push("/");
     }
 
+    // Handling TextArea
 
     const handleClick = () => {
         setTextarea(true);
     }
 
-    // const cancelPost = () => {
-    //     setOpen(false);
-    // }
-
-    const dbRef = collection(db, "posts");
+    // Adding New Recipe to Firestore
 
     const postRecipe = async (e) => {
 
         e.preventDefault();
         console.log(e);
 
-        // setOpen(false);
 
         const newRecipe = {
             title: e.target[0].value,
@@ -129,11 +128,25 @@ export default function Dashboard() {
     };
 
 
+    // Modal handler
 
     const handler = () => setOpenModal(true);
     const closeHandler = () => {
         setOpenModal(false);
         console.log("closed");
+    };
+
+    // Handling Deleting of Posts
+    const handleDelete = async (id) => {
+        try {
+            // Create a reference to the document
+            const docRef = doc(db, "posts", id);
+            // Delete the document from Firestore
+            await deleteDoc(docRef);
+            console.log("Document deleted successfully!");
+        } catch (error) {
+            console.error("Error deleting document:", error);
+        }
     };
 
 
@@ -146,14 +159,14 @@ export default function Dashboard() {
             <div className="flex flex-col text-center h-screen max-w-[10rem] px-6 shadow-lg">
                 <nav className="flex-1 mt-6">
                     <div className="mt-12 cursor-pointer">
-                        <img src={currentUser.photoURL} className="inline-block rounded-full w-[50px]" alt="profile-pic" />
+                        <img src={currentUser.photoURL} className="inline-block m-auto rounded-full w-[50px]" alt="profile-pic" />
                     </div>
                     <div className="mt-12 cursor-pointer">
-                        <FaSearch size={15} className="inline-block text-16" />
+                        <FaSearch size={25} className="inline-block text-dark-gray" />
                     </div>
                     <div className="mt-12 cursor-pointer">
-                        <Button onPress={handler} size='xs' css={{ backgroundColor: '$blue400' }}>
-                            <FaEdit size={15} className="inline-block" />
+                        <Button onPress={handler} light size='xs' css={{ height: '$12' }}>
+                            <FaEdit size={25} className="inline-block text-dark-gray" />
                         </Button>
                     </div>
 
@@ -164,7 +177,7 @@ export default function Dashboard() {
                     </Modal> */}
 
                     {/* NextUI Modal  */}
-                    <ModalForm content={<RecipeForm handleSubmit={postRecipe} handleRef={formRef}/>} openModal={openModal} closeHandler={closeHandler}/>
+                    <ModalForm content={<RecipeForm handleSubmit={postRecipe} handleRef={formRef} />} openModal={openModal} closeHandler={closeHandler} />
 
                 </nav>
 
@@ -175,22 +188,20 @@ export default function Dashboard() {
             {/* body of dashboard */}
 
             {posts && posts.length > 0 ? (
-                <div className="grid grid-cols-1 h-screen overflow-y-auto w-[50%]">
+                <div className="grid grid-cols-1 h-screen overflow-y-auto w-[50%] hide-scrollbar bg-[#f6fff3]">
                     <div className="h-[10%]">
                         {posts.map((post, index) => {
                             return (
-                                <div key={index} className="bg-fresh-green px-4 py-4 mt-4">
+                                <div key={index} className="bg-white shadow-xl px-4 rounded-lg py-4 mt-4">
                                     <h1 className="text-lg font-bold">{post.title}</h1>
-                                    <div className="flex flex-row gap-4">
+                                    <div className="flex flex-row text-md text-dark-gray gap-2 mb-2">
                                         <img className="rounded-full h-[20px] w-[20px]" width={25} height={25} src={currentUser.photoURL} alt="profilePhoto" />
-                                        <div>
-                                            <p>{currentUser.displayName}</p>
-                                            <p>{post.content}</p>
-                                        </div>
+                                        <p>{currentUser.displayName}</p>
                                     </div>
-                                    <div className="flex flex-row">
-                                        <FaHeart />
-                                        <FaTrash />
+                                    <p>{post.content}</p>
+                                    <div className="flex flex-row justify-end gap-6 mt-3">
+                                        <MdFavoriteBorder size={20} className='text-dark-gray' />
+                                        <MdDeleteOutline onClick={handleDelete} size={20} className='text-dark-gray cursor-pointer' />
                                     </div>
                                 </div>
                             )
@@ -208,28 +219,11 @@ export default function Dashboard() {
 
             )}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         </div>
     )
-} 
+}
 
 
 // Things to implement
-// 1. Change the style Navbar buttons on dashboard page 
-// 2. Remove the scrollbar on dashboard page 
+// 2. Remove the scrollbar on dashboard page
 // 3. Add timestamps to posts 
