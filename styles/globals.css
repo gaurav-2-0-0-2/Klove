@@ -10,7 +10,7 @@
     animation-iteration-count: 1;
     animation-timing-function: ease-in-out;
     animation-fill-mode: forwards;
-    
+
 }
 
 
@@ -18,12 +18,12 @@
 
     from {
         transform: translateX(-240px) translateY(64px);
-        
+
     }
 
     to {
         transform: translateY(64px) translateX(20px);
-        
+
     }
 
 }
@@ -46,27 +46,30 @@
     }
 }
 
-.hero-text1{
+.hero-text1 {
     animation: slide-right 2500ms;
 
 }
-.hero-text2{
+
+.hero-text2 {
     animation: slide-right 3000ms;
 
 }
-.hero-text3{
+
+.hero-text3 {
     animation: slide-right 3500ms;
 
 }
 
 
-@keyframes slide-right{
+@keyframes slide-right {
 
-    from{
+    from {
         transform: translateX(-100%);
     }
-    to{
+
+    to {
         transform: translateX(0%);
     }
-    
+
 }
