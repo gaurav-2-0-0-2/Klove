@@ -1,12 +1,18 @@
 // import Image from "next/image"
+import { Nunito } from 'next/font/google';
 
+const nunito = Nunito({ 
+    subsets: ['latin'], 
+    weight: ['400', '700'],
+    variable: '--font-nunito'
+});
 
 
 
 
 export default function Body() {
     return (
-        <div className={`px-10 pt-20 h-[33rem] bg-white`}>
+        <div className={`${nunito.variable} font-sans2 px-10 pt-20 h-[33rem] bg-white`}>
             <div className="flex">
                 <div>
                     <h1 className="hero-text1 text-7xl text-vibrant-orange">SHARE YOUR</h1>

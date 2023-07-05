@@ -14,6 +14,8 @@ module.exports = {
       },
       fontFamily:{
           sans: ['var(--font-dancingscript)'],
+          sans2: ['var(--font-nunito)']
+
       },
     },
     colors:{
@@ -25,6 +27,7 @@ module.exports = {
       'vibrant-orange': '#FF7F50',
       'vibrant-orange-dark': '#FF885C',
       'dark-gray': '#5e5d5d',
+
     },
   },
   plugins: [],

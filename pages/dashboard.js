@@ -1,17 +1,24 @@
-"use client";
+// "use client";
 import React from 'react';
-import { auth, db, logout, postRecipe } from "../../firebase.config";
+import { auth, db, logout, postRecipe } from "../firebase.config";
 import { query, collection, getDocs, where, addDoc, onSnapshot, deleteDoc, doc } from "firebase/firestore";
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { FaUser, FaHome, FaSearch, FaEdit, FaHeart, FaTrash } from "react-icons/fa"
-import NoActivity from "../component/NoActivity";
-import RecipeForm from "../component/RecipeForm";
-import LoadingText from "../component/LoadingText";
-import ModalForm from "../component/Modal";
+import NoActivity from "./component/NoActivity";
+import RecipeForm from "./component/RecipeForm";
+import LoadingText from "./component/LoadingText";
+import ModalForm from "./component/Modal";
 import { Button } from "@nextui-org/react";
 import { MdDeleteOutline, MdFavoriteBorder } from "react-icons/md";
+import { Nunito } from 'next/font/google';
+
+const nunito = Nunito({ 
+    subsets: ['latin'], 
+    weight: ['400', '700'],
+    variable: '--font-nunito'
+});
 
 
 
@@ -49,19 +56,24 @@ export default function Dashboard() {
             let updatePosts = [];
             snapshot.docChanges().forEach((change) => {
 
+                let postChange = change.doc.data();
+                postChange.id = change.doc.id;
+
                 if (change.type === "added") {
-                    console.log("New post: ", change.doc.data());
+                    console.log("New post: ", postChange);
                     // updatePosts.push(change.doc.data());
-                    updatePosts.push(change.doc.data());
+                    updatePosts.unshift(postChange);
                     // setPosts((prevPosts) => [...prevPosts, change.doc.data()]);
 
                 }
                 // if (change.type === "modified") {
                 //     console.log("Modified post: ", change.doc.data());
                 // }
-                // if (change.type === "removed") {
-                //     console.log("Removed post: ", change.doc.data());
-                // }
+                if (change.type === "removed") {
+                    console.log("Removed post: ", postChange);
+                    let index = updatePosts.findIndex(post=> post.id === postChange.id);
+                    updatePosts.splice(index,1);
+                }
             });
             setPosts(updatePosts);
             setLoading(false);
@@ -79,11 +91,7 @@ export default function Dashboard() {
         } else if (currentUser == null) {
             router.push("/login");
         }
-
         // fetchPosts();
-
-
-
 
     }, []);
 
@@ -137,29 +145,27 @@ export default function Dashboard() {
     };
 
     // Handling Deleting of Posts
-    const handleDelete = async (id) => {
-        try {
-            // Create a reference to the document
-            const docRef = doc(db, "posts", id);
-            // Delete the document from Firestore
-            await deleteDoc(docRef);
-            console.log("Document deleted successfully!");
-        } catch (error) {
-            console.error("Error deleting document:", error);
-        }
-    };
+    // const handleDelete = async (post) => {
+    //     try {
+    //        await deleteDoc(dbRef, post.id);
+    //     } catch (error) {
+    //         console.error("post not deleted");
+    //     }
+
+       
+    // };
 
 
 
     return (
-        <div className="flex flex-row gap-10">
+        <div className={` ${nunito.variable} font-sans2 flex flex-row gap-10`}>
 
             {/* Vertical Navbar on far left */}
 
             <div className="flex flex-col text-center h-screen max-w-[10rem] px-6 shadow-lg">
                 <nav className="flex-1 mt-6">
                     <div className="mt-12 cursor-pointer">
-                        <img src={currentUser.photoURL} className="inline-block m-auto rounded-full w-[50px]" alt="profile-pic" />
+                        <img src={ currentUser && currentUser.photoURL} className="inline-block m-auto rounded-full w-[50px]" alt="profile-pic" />
                     </div>
                     <div className="mt-12 cursor-pointer">
                         <FaSearch size={25} className="inline-block text-dark-gray" />
@@ -188,20 +194,20 @@ export default function Dashboard() {
             {/* body of dashboard */}
 
             {posts && posts.length > 0 ? (
-                <div className="grid grid-cols-1 h-screen overflow-y-auto w-[50%] hide-scrollbar bg-[#f6fff3]">
+                <div className="grid grid-cols-1 h-screen overflow-y-auto w-[50%] hide-scrollbar">
                     <div className="h-[10%]">
                         {posts.map((post, index) => {
                             return (
-                                <div key={index} className="bg-white shadow-xl px-4 rounded-lg py-4 mt-4">
+                                <div key={index} className="bg-white shadow-lg border-2 border-gray-[200] px-4 rounded-lg py-4 mt-4">
                                     <h1 className="text-lg font-bold">{post.title}</h1>
                                     <div className="flex flex-row text-md text-dark-gray gap-2 mb-2">
-                                        <img className="rounded-full h-[20px] w-[20px]" width={25} height={25} src={currentUser.photoURL} alt="profilePhoto" />
-                                        <p>{currentUser.displayName}</p>
+                                        <img className="rounded-full h-[20px] w-[20px]" width={25} height={25} src={currentUser && currentUser.photoURL} alt="profilePhoto" />
+                                        <p>{ currentUser && currentUser.displayName}</p>
                                     </div>
                                     <p>{post.content}</p>
                                     <div className="flex flex-row justify-end gap-6 mt-3">
                                         <MdFavoriteBorder size={20} className='text-dark-gray' />
-                                        <MdDeleteOutline onClick={handleDelete} size={20} className='text-dark-gray cursor-pointer' />
+                                        <MdDeleteOutline size={20} className='text-dark-gray cursor-pointer' />
                                     </div>
                                 </div>
                             )
