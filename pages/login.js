@@ -1,6 +1,4 @@
 // "use client";
-import { useState } from "react";
-import {auth, signInWithGoogle} from "../firebase.config";
 import {useRouter} from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { FaGoogle } from "react-icons/fa";
