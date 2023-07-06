@@ -1,7 +1,7 @@
 // "use client";
 import React from 'react';
-import { auth, db, logout, postRecipe } from "../firebase.config";
-import { query, collection, getDocs, where, addDoc, onSnapshot, deleteDoc, doc } from "firebase/firestore";
+import {db} from "../firebase.config";
+import { query, collection, getDocs, where, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -114,20 +114,20 @@ export default function Dashboard() {
     const postRecipe = async (e) => {
 
         e.preventDefault();
-        console.log(e);
+        // console.log(e);
 
 
         const newRecipe = {
             title: e.target[0].value,
             content: e.target[1].value,
-            uid: currentUser.uid
+            uid: currentUser.uid,
+            timeStamp: serverTimestamp(),
         }
 
         try {
             // Adding document in posts collection on firestore
             await addDoc(dbRef, newRecipe);
             queryDB();
-
             // posts.push(newRecipe);
             // console.log(posts);
         } catch (err) {
