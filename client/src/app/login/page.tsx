@@ -7,8 +7,7 @@ import { signIn } from 'next-auth/react'
 export default function login() {
   return (
     <div>
-      <Button onClick={()=>signIn('google', {callbackUrl: "http://localhost:3000/profile"})}>Login</Button>
-      {/* <Button onClick={()=>signIn('google', {callbackUrl: `http://localhost:3000/profile`})}>Login</Button> */}
+	    <Button onClick={()=>signIn('google', {callbackUrl: `${process.env.NEXT_PUBLIC_URL}/profile`})}>Login</Button>
     </div>
   )
 }
