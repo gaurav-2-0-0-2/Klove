@@ -18,14 +18,14 @@ export default function SignupForm() {
     console.log(formData);
   };
 
-  const handleSubmit:any = (e:any)=>{
-    e.preventDefault();
+  // const handleSubmit:any = (e:any)=>{
+  //   e.preventDefault();
     
-  }
+  // }
 
 
   return (
-  <form onSubmit={handleSubmit}>
+  <form>
       <Input
         type="text"
         placeholder="username"
