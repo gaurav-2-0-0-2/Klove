@@ -1,7 +1,11 @@
+"use client"
 import React from 'react'
+import SignupForm from '@/components/signup/SignupForm'
 
 export default function signup() {
   return (
-    <div>this is sign up page</div>
+    <div>
+      <SignupForm/>
+    </div>
   )
 }
