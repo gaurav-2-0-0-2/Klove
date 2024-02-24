@@ -10,12 +10,10 @@ export const metadata: Metadata = {
 
 export default function ProfileLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <section>{children}</section>
   );
 }
