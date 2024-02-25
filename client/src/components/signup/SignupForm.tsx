@@ -9,10 +9,7 @@ const ADD_USER = gql`
   # adding a new user to database
   mutation CreateUser($name: String!, $email: String!, $password: String!) {
     signup(name: $name, email: $email, password: $password) {
-      id
-      name
-      email
-      password
+      token 
     }
   }
 `;
