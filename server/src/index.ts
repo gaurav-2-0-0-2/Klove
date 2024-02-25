@@ -1,21 +1,22 @@
-import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
+import {createServer} from "node:http";
+import { createYoga } from "graphql-yoga";
+import { createSchema } from "graphql-yoga";
 import resolvers from "./resolvers/resolvers.js";
 import { typeDefs } from "./schema/schema.js";
-// import { context } from "./context.js";
 import { PrismaClient } from '@prisma/client'
+import { PrismaContext } from "./context.js";
 const prisma = new PrismaClient()
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
+const schema = createSchema({
+  typeDefs, resolvers
+})
 
-const { url } = await startStandaloneServer(server, {
-  listen: { port: 4000 },
-  context: async ({}) => {
-    return prisma;
-  },
-});
+const yoga = createYoga({schema, context: ():PrismaContext => ({prisma})});
 
-console.log(`🚀  Server ready at: ${url}`);
+const server = createServer(yoga);
+
+server.listen(4000, ()=>{
+  console.log('Server is running on http://localhost:4000/graphql')
+})
+
+
